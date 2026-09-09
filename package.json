@@ -10,6 +10,7 @@
     "seed": "tsx scripts/seed-master-data.ts"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.116.0",
     "browser-image-compression": "^2.0.2",
     "clsx": "^2.1.1",
