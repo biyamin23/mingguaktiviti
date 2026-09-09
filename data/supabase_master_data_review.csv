@@ -1,0 +1,7 @@
+﻿form,homeroom_name,advisor_name_source,salary_no_in_homeroom_sheet,matched_teacher_name,salary_no_in_teacher_master,match_score,issue
+2,CIKGU AZAM,MOHAMAD AZAM BIN MANAF,247627,MOHD AZAM BIN MANAF,271253,0.9268,Nombor gaji berbeza antara Sheet1 dan Sheet2
+2,USTAZ MUHAMMAD,MUHAMMAD BIN ALI,292575,MOHAMAD BIN ALI,280231,0.9032,Nombor gaji berbeza antara Sheet1 dan Sheet2
+3,CIKGU FAIROZ,FAIROZ BINTI MOHAMED MOKHTAR,292575,FAIROZ BT MOHAMED,218261,0.8333,Nombor gaji berbeza antara Sheet1 dan Sheet2; Nama tidak sepadan tepat; semak manual
+3,CIKGU SAZA,SAZARATUL NUR FATIHAH BINTI ZAKARIA,292575,SAZARATUL NUR FATIHAH BINYI ZAKARIA,331669,1.0,Nombor gaji berbeza antara Sheet1 dan Sheet2
+4,CIKGU AZLINA,NURAZLINA BINTI ABDULLAH,207971,NURAZLINA ABDULLAH,207971,0.8571,Nama tidak sepadan tepat; semak manual
+5,CIKGU HAZLIEN,NOR HAZLIEN BT MOHD SANITU,206228,NOR HAZLIEN BINTI MOHD SANITU,269799,1.0,Nombor gaji berbeza antara Sheet1 dan Sheet2
