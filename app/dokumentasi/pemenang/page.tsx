@@ -92,9 +92,12 @@ export default function DokumentasiPemenangPage() {
         <div className="border-b-2 border-[#1646A0] pb-6 mb-6">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-[#0B2F6B] text-white flex items-center justify-center font-black text-xl shadow-md shrink-0">
-                MRSM
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src="/logo-mrsm.png" 
+                alt="Logo Maktab Rendah Sains MARA" 
+                className="w-16 h-16 object-contain shrink-0 filter drop-shadow-xs" 
+              />
               <div>
                 <div className="text-xs font-bold tracking-wider text-[#1646A0] uppercase">
                   Maktab Rendah Sains MARA Tumpat

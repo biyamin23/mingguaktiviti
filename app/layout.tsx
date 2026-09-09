@@ -15,6 +15,11 @@ export const metadata: Metadata = {
   title: 'Portal Minggu Aktiviti Semester 2 — MRSM Tumpat 2026',
   description: 'Pusat Kawalan & Pengurusan Rasmi Minggu Aktiviti Semester 2 MRSM Tumpat 2026 (13–15 September 2026). Jadual aktiviti, keputusan pertandingan, ranking merit, dan dokumentasi bergambar.',
   keywords: ['MRSM Tumpat', 'Minggu Aktiviti', '2026', 'Semester 2', 'Merit', 'Homeroom'],
+  icons: {
+    icon: '/logo-mrsm.png',
+    shortcut: '/logo-mrsm.png',
+    apple: '/logo-mrsm.png',
+  },
 };
 
 export default function RootLayout({

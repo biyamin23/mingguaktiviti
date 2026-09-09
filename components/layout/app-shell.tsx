@@ -20,7 +20,6 @@ import {
   ChevronRight,
   ChevronDown,
   Sparkles,
-  School,
   FileCheck2,
   FolderKanban,
   Users,
@@ -93,8 +92,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </button>
 
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0B2F6B] to-[#2563EB] text-white flex items-center justify-center shadow-md shadow-blue-900/10 group-hover:scale-105 transition-transform">
-                <School className="w-5 h-5 text-white" />
+              <div className="relative w-11 h-11 shrink-0 group-hover:scale-105 transition-transform flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                  src="/logo-mrsm.png" 
+                  alt="Logo Rasmi MRSM Tumpat" 
+                  className="w-full h-full object-contain filter drop-shadow-xs" 
+                />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
@@ -271,11 +275,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             />
             <div className="relative w-72 max-w-[80vw] bg-white h-full shadow-2xl flex flex-col p-6 z-10 overflow-y-auto">
               <div className="flex items-center justify-between pb-4 border-b border-[#F1F5F9] mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-[#0B2F6B] text-white flex items-center justify-center font-black text-xs">
-                    MT
-                  </div>
-                  <span className="font-bold text-sm text-[#0B2F6B]">Menu Portal</span>
+                <div className="flex items-center gap-2.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src="/logo-mrsm.png" 
+                    alt="Logo MRSM Tumpat" 
+                    className="w-8 h-8 object-contain shrink-0" 
+                  />
+                  <span className="font-bold text-sm text-[#0B2F6B]">MRSM Tumpat</span>
                 </div>
                 <button
                   onClick={() => setMobileMenuOpen(false)}

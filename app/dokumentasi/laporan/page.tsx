@@ -238,9 +238,12 @@ export default function DokumentasiLaporanPage() {
             {/* Official MRSM Header */}
             <div className="border-b-2 border-[#1646A0] pb-6 mb-6">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-[#0B2F6B] text-white flex items-center justify-center font-black text-2xl shadow-md shrink-0">
-                  MRSM
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                  src="/logo-mrsm.png" 
+                  alt="Logo Maktab Rendah Sains MARA" 
+                  className="w-16 h-16 object-contain shrink-0 filter drop-shadow-xs" 
+                />
                 <div>
                   <div className="text-xs font-bold tracking-widest text-[#1646A0] uppercase">
                     Maktab Rendah Sains MARA Tumpat
