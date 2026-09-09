@@ -30,12 +30,14 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/session/auth-context';
+import { useAdmin } from '@/lib/session/admin-context';
 import { LoginModal } from './login-modal';
 import { Button } from '@/components/ui/button';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, logout, openLoginModal } = useAuth();
+  const { isAdmin } = useAdmin();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dataMasterOpen, setDataMasterOpen] = useState(pathname.startsWith('/data-master'));
   const [dokOpen, setDokOpen] = useState(pathname.startsWith('/dokumentasi'));
@@ -176,6 +178,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       <div className="flex items-center gap-2.5">
                         <item.icon className={cn('w-4 h-4', isSubActive ? 'text-[#1646A0]' : 'text-[#64748B]')} />
                         <span>{item.label}</span>
+                        {item.label === 'Data Master' && (
+                          <span className={cn(
+                            'text-[9px] font-bold px-1.5 py-0.5 rounded border',
+                            isAdmin 
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                              : 'bg-amber-50 text-amber-800 border-amber-200'
+                          )}>
+                            {isAdmin ? 'Admin' : 'Kunci'}
+                          </span>
+                        )}
                       </div>
                       {item.isOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                     </button>
@@ -278,8 +290,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   if (item.subItems) {
                     return (
                       <div key={item.label} className="space-y-1 py-1">
-                        <div className="px-3 py-1 text-xs font-bold text-[#94A3B8] uppercase">
-                          {item.label}
+                        <div className="px-3 py-1 text-xs font-bold text-[#94A3B8] uppercase flex items-center justify-between">
+                          <span>{item.label}</span>
+                          {item.label === 'Data Master' && (
+                            <span className={cn(
+                              'text-[9px] font-bold px-1.5 py-0.5 rounded border normal-case',
+                              isAdmin 
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                                : 'bg-amber-50 text-amber-800 border-amber-200'
+                            )}>
+                              {isAdmin ? 'Admin' : 'Kunci'}
+                            </span>
+                          )}
                         </div>
                         {item.subItems.map((sub) => (
                           <Link

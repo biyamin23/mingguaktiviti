@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/session/auth-context';
+import { AdminProvider } from '@/lib/session/admin-context';
 import { ToastProvider } from '@/components/ui/toast';
 import { AppShell } from '@/components/layout/app-shell';
 
@@ -25,11 +26,13 @@ export default function RootLayout({
     <html lang="ms" className={inter.className}>
       <body suppressHydrationWarning className="min-h-screen bg-[#F5F8FC] antialiased selection:bg-[#BFDBFE] selection:text-[#0B2F6B]">
         <AuthProvider>
-          <ToastProvider>
-            <AppShell>
-              {children}
-            </AppShell>
-          </ToastProvider>
+          <AdminProvider>
+            <ToastProvider>
+              <AppShell>
+                {children}
+              </AppShell>
+            </ToastProvider>
+          </AdminProvider>
         </AuthProvider>
       </body>
     </html>
