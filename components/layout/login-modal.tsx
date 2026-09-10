@@ -37,7 +37,7 @@ export function LoginModal() {
         closeLoginModal();
         setErrorMsg('');
       }}
-      title="Log Masuk Guru"
+      title="Login"
       description="Sila masukkan Nombor Gaji anda untuk mengakses modul keputusan & laporan."
       maxWidth="md"
     >

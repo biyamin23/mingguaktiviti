@@ -149,7 +149,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 className="shadow-xs"
               >
                 <LogIn className="w-4 h-4 mr-1.5" />
-                <span>Log Masuk Guru</span>
+                <span>Login</span>
               </Button>
             )}
           </div>
@@ -385,7 +385,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     className="w-full"
                   >
                     <LogIn className="w-4 h-4 mr-1.5" />
-                    Log Masuk Guru
+                    Login
                   </Button>
                 )}
               </div>
