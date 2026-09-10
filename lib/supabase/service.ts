@@ -788,6 +788,44 @@ export async function saveCompetitionResult(params: {
   return { data: newResult, error: null };
 }
 
+export async function deleteCompetitionResult(competitionId: string): Promise<{ success: boolean; error: string | null }> {
+  if (isSupabaseConfigured) {
+    try {
+      const { error } = await supabase.from('results').delete().eq('competition_id', competitionId);
+      if (error) {
+        console.error('Error deleting result from Supabase:', error);
+        return { success: false, error: error.message };
+      }
+    } catch (e: any) {
+      console.warn('Supabase deleteCompetitionResult error:', e);
+      return { success: false, error: e.message || 'Ralat memadam keputusan.' };
+    }
+  }
+
+  const existing = await getResults();
+  const filtered = existing.filter(r => r.competition_id !== competitionId);
+  setLocalStore('results', filtered);
+  return { success: true, error: null };
+}
+
+export async function clearAllResults(): Promise<{ success: boolean; error: string | null }> {
+  if (isSupabaseConfigured) {
+    try {
+      const { error } = await supabase.from('results').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      if (error) {
+        console.error('Error clearing all results from Supabase:', error);
+        return { success: false, error: error.message };
+      }
+    } catch (e: any) {
+      console.warn('Supabase clearAllResults error:', e);
+      return { success: false, error: e.message || 'Ralat mengosongkan semua keputusan.' };
+    }
+  }
+
+  setLocalStore('results', []);
+  return { success: true, error: null };
+}
+
 // -------------------------------------------------------------
 // 7. RANKING ENGINE (T1 - T4)
 // -------------------------------------------------------------

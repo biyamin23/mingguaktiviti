@@ -8,7 +8,10 @@ import {
   ArrowRight, 
   Sparkles, 
   LogIn, 
-  Check
+  Check,
+  Trash2,
+  RotateCcw,
+  AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -16,17 +19,21 @@ import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/lib/session/auth-context';
+import { useAdmin } from '@/lib/session/admin-context';
 import { useToast } from '@/components/ui/toast';
 import { 
   getCompetitions, 
   getHomeroomsByForm, 
   saveCompetitionResult, 
+  deleteCompetitionResult,
+  clearAllResults,
   getResults 
 } from '@/lib/supabase/service';
 import { Competition, Homeroom, Result, FormLevel } from '@/types/database';
 
 export default function KeputusanPage() {
   const { user, openLoginModal } = useAuth();
+  const { isAdmin, loginAdmin } = useAdmin();
   const toast = useToast();
 
   const [competitions, setCompetitions] = useState<Competition[]>([]);
@@ -56,6 +63,13 @@ export default function KeputusanPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Delete & Reset Modals
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isResetAllModalOpen, setIsResetAllModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [resetAdminPassword, setResetAdminPassword] = useState('');
+  const [resetError, setResetError] = useState('');
 
   useEffect(() => {
     loadCompetitions();
@@ -196,6 +210,49 @@ export default function KeputusanPage() {
     }
   };
 
+  const handleDeleteCompetitionResult = async () => {
+    if (!selectedCompetition) return;
+    setDeleting(true);
+    const res = await deleteCompetitionResult(selectedCompetition.id);
+    setDeleting(false);
+    setIsDeleteModalOpen(false);
+
+    if (res.success) {
+      toast.success(`Keputusan bagi ${selectedCompetition.name} berjaya dipadam.`);
+      setPlacements({ 1: '', 2: '', 3: '', 4: '', 5: '' });
+      const results = await getResults();
+      setExistingResults(results);
+    } else {
+      toast.error(res.error || 'Gagal memadam keputusan.');
+    }
+  };
+
+  const handleClearAllResults = async () => {
+    if (!isAdmin) {
+      const loginRes = loginAdmin(resetAdminPassword);
+      if (!loginRes.success) {
+        setResetError(loginRes.error || 'Kata laluan pentadbir tidak tepat.');
+        return;
+      }
+    }
+
+    setDeleting(true);
+    const res = await clearAllResults();
+    setDeleting(false);
+
+    if (res.success) {
+      toast.success('Semua data keputusan pemenang berjaya dikosongkan!');
+      setIsResetAllModalOpen(false);
+      setResetAdminPassword('');
+      setResetError('');
+      setPlacements({ 1: '', 2: '', 3: '', 4: '', 5: '' });
+      setExistingResults([]);
+    } else {
+      setResetError(res.error || 'Gagal mengosongkan keputusan.');
+      toast.error(res.error || 'Gagal mengosongkan keputusan.');
+    }
+  };
+
   const participatingCount = Math.max(0, availableHomerooms.length - 5);
 
   const getHomeroomName = (id: string) => {
@@ -221,13 +278,32 @@ export default function KeputusanPage() {
           </p>
         </div>
 
-        {/* User Session Requirement Banner */}
-        {!user && (
-          <Button variant="gold" size="sm" onClick={openLoginModal}>
-            <LogIn className="w-4 h-4 mr-1.5" />
-            Log Masuk Untuk Merekod
-          </Button>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {existingResults.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setResetAdminPassword('');
+                setResetError('');
+                setIsResetAllModalOpen(true);
+              }}
+              className="text-[#DC2626] border-[#FECACA] bg-[#FEF2F2]/60 hover:bg-[#FEF2F2] text-xs font-semibold"
+            >
+              <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+              Kosongkan Semua Keputusan ({existingResults.length})
+            </Button>
+          )}
+
+          {/* User Session Requirement Banner */}
+          {!user && (
+            <Button variant="gold" size="sm" onClick={openLoginModal}>
+              <LogIn className="w-4 h-4 mr-1.5" />
+              Login Untuk Merekod
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Main Form Container */}
@@ -285,6 +361,20 @@ export default function KeputusanPage() {
                       <Badge variant="warning">Belum Direkodkan</Badge>
                     )}
                   </div>
+                  {existingResults.some(r => r.competition_id === selectedCompetition.id) && (
+                    <div className="pt-2 border-t border-[#E2E8F0] flex justify-end">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsDeleteModalOpen(true)}
+                        className="text-[#DC2626] border-[#FECACA] hover:bg-[#FEF2F2] text-xs h-8 w-full"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                        Padam Keputusan Pertandingan Ini
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -528,6 +618,119 @@ export default function KeputusanPage() {
             >
               <Check className="w-4 h-4 mr-1.5" />
               Ya, Sahkan & Simpan
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Single Competition Result Modal */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Padam Keputusan Pertandingan?"
+        description="Pengesahan untuk memadam keputusan bagi pertandingan yang dipilih."
+        maxWidth="md"
+      >
+        <div className="space-y-4">
+          <div className="p-3.5 bg-[#FEF2F2] rounded-xl border border-[#FECACA] text-xs text-[#991B1B] flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 text-[#DC2626] shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold">Amaran Pemadaman Keputusan</p>
+              <p className="mt-0.5 text-xs text-[#B91C1C]">
+                Tindakan ini akan memadam rekod pemenang bagi <strong>{selectedCompetition?.name}</strong> dan menarik balik mata merit yang telah diberikan kepada semua homeroom bertanding.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#F1F5F9]">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsDeleteModalOpen(false)}
+              disabled={deleting}
+            >
+              Batal
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleDeleteCompetitionResult}
+              isLoading={deleting}
+              className="bg-[#DC2626] hover:bg-[#B91C1C] text-white border-none"
+            >
+              <Trash2 className="w-4 h-4 mr-1.5" />
+              Ya, Padam Keputusan
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Reset All Results Modal */}
+      <Modal
+        isOpen={isResetAllModalOpen}
+        onClose={() => {
+          setIsResetAllModalOpen(false);
+          setResetAdminPassword('');
+          setResetError('');
+        }}
+        title="Kosongkan Semua Data Pemenang?"
+        description="Tindakan ini akan memadam kesemua rekod keputusan dan mengembalikan jadual ranking kepada kosong."
+        maxWidth="md"
+      >
+        <div className="space-y-4">
+          <div className="p-3.5 bg-[#FEF2F2] rounded-xl border border-[#FECACA] text-xs text-[#991B1B] flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 text-[#DC2626] shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold">Amaran Pengosongan Menyeluruh</p>
+              <p className="mt-0.5 text-xs text-[#B91C1C]">
+                Tindakan ini akan memadam <strong>semua keputusan ({existingResults.length} pertandingan)</strong> dan mengosongkan semua mata merit kumulatif dalam carta kedudukan (*ranking*).
+              </p>
+            </div>
+          </div>
+
+          {!isAdmin && (
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold text-[#172033]">
+                Kata Laluan Pentadbir (Admin)
+              </label>
+              <input
+                type="password"
+                value={resetAdminPassword}
+                onChange={(e) => {
+                  setResetAdminPassword(e.target.value);
+                  if (resetError) setResetError('');
+                }}
+                placeholder="Masukkan kata laluan admin"
+                className="w-full px-3 py-2 text-xs bg-white border border-[#CBD5E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DC2626]"
+              />
+              {resetError && (
+                <p className="text-xs text-[#DC2626]">{resetError}</p>
+              )}
+            </div>
+          )}
+
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#F1F5F9]">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsResetAllModalOpen(false);
+                setResetAdminPassword('');
+                setResetError('');
+              }}
+              disabled={deleting}
+            >
+              Batal
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleClearAllResults}
+              isLoading={deleting}
+              className="bg-[#DC2626] hover:bg-[#B91C1C] text-white border-none"
+            >
+              <RotateCcw className="w-4 h-4 mr-1.5" />
+              Sahkan Kosongkan Semua
             </Button>
           </div>
         </div>
