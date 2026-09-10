@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Medal, 
-  Crown, 
+import {
+  Medal,
+  Crown,
   TrendingUp
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -61,11 +61,10 @@ export default function RankingPage() {
             <button
               key={form}
               onClick={() => setActiveForm(form)}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-                activeForm === form
-                  ? 'bg-white text-[#1646A0] shadow-xs'
-                  : 'text-[#64748B] hover:text-[#172033]'
-              }`}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activeForm === form
+                ? 'bg-white text-[#1646A0] shadow-xs'
+                : 'text-[#64748B] hover:text-[#172033]'
+                }`}
             >
               Tingkatan {form}
             </button>
@@ -98,7 +97,7 @@ export default function RankingPage() {
                   <div className="w-10 h-10 rounded-full bg-[#F1F5F9] border-2 border-[#94A3B8] text-[#334155] flex items-center justify-center font-black text-sm mb-2 shadow-xs">
                     #2
                   </div>
-                  <Badge variant="silver" size="sm" className="mb-2">Naib Juara</Badge>
+                  <Badge variant="silver" size="sm" className="mb-2">Naib Johan</Badge>
                   <h3 className="text-base font-bold text-[#172033]">{topThree[1].homeroom_name}</h3>
                   <p className="text-xs text-[#64748B] mb-3">{topThree[1].advisor_name}</p>
                   <div className="text-2xl font-black text-[#334155]">
@@ -120,7 +119,7 @@ export default function RankingPage() {
                   <div className="w-12 h-12 rounded-full bg-[#FBBF24] text-[#78350F] flex items-center justify-center font-black text-lg mb-2 shadow-sm">
                     <Crown className="w-6 h-6" />
                   </div>
-                  <Badge variant="gold" size="sm" className="mb-2">#1 Juara Bertahan</Badge>
+                  <Badge variant="gold" size="sm" className="mb-2">#1 Johan</Badge>
                   <h3 className="text-lg font-extrabold text-[#172033]">{topThree[0].homeroom_name}</h3>
                   <p className="text-xs text-[#64748B] mb-4">{topThree[0].advisor_name}</p>
                   <div className="text-3xl font-black text-[#D97706]">
@@ -192,15 +191,14 @@ export default function RankingPage() {
                     >
                       <td className="py-3 px-4 text-center">
                         <span
-                          className={`w-7 h-7 rounded-full inline-flex items-center justify-center font-bold text-xs ${
-                            isGold
-                              ? 'bg-[#FBBF24] text-[#78350F]'
-                              : isSilver
+                          className={`w-7 h-7 rounded-full inline-flex items-center justify-center font-bold text-xs ${isGold
+                            ? 'bg-[#FBBF24] text-[#78350F]'
+                            : isSilver
                               ? 'bg-[#E2E8F0] text-[#334155]'
                               : isBronze
-                              ? 'bg-[#FFEDD5] text-[#9A3412]'
-                              : 'bg-[#F1F5F9] text-[#64748B]'
-                          }`}
+                                ? 'bg-[#FFEDD5] text-[#9A3412]'
+                                : 'bg-[#F1F5F9] text-[#64748B]'
+                            }`}
                         >
                           {item.rank}
                         </span>
