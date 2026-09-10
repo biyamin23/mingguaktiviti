@@ -5,7 +5,7 @@ import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/session/auth-context';
 import { useToast } from '@/components/ui/toast';
-import { LogIn, KeyRound, AlertCircle, Sparkles } from 'lucide-react';
+import { LogIn, KeyRound, AlertCircle } from 'lucide-react';
 
 export function LoginModal() {
   const { isLoginModalOpen, closeLoginModal, login } = useAuth();
@@ -28,11 +28,6 @@ export function LoginModal() {
     } else {
       setErrorMsg(res.error || 'Nombor gaji tidak ditemui.');
     }
-  };
-
-  const handleQuickLogin = (code: string) => {
-    setSalaryNo(code);
-    setErrorMsg('');
   };
 
   return (
@@ -69,7 +64,7 @@ export function LoginModal() {
                 setSalaryNo(e.target.value);
                 if (errorMsg) setErrorMsg('');
               }}
-              placeholder="Contoh: G1001"
+              placeholder="Contoh: 310000"
               className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-[#CBD5E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2563EB] uppercase font-mono tracking-wider"
             />
           </div>
@@ -79,28 +74,7 @@ export function LoginModal() {
         </div>
 
         {/* Quick Demo Credentials */}
-        <div className="pt-2 border-t border-[#F1F5F9]">
-          <div className="flex items-center gap-1.5 text-[11px] text-[#64748B] mb-2 font-medium">
-            <Sparkles className="w-3.5 h-3.5 text-[#FBBF24]" />
-            <span>Pilihan Ujian Pantas (Contoh Guru):</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { code: 'G1001', name: 'Cikgu Faris (Penyelaras)' },
-              { code: 'G1002', name: 'Ustazah Siti Aminah (T1)' },
-              { code: 'G1006', name: 'Cikgu Noraini (T3)' }
-            ].map((demo) => (
-              <button
-                key={demo.code}
-                type="button"
-                onClick={() => handleQuickLogin(demo.code)}
-                className="px-2.5 py-1 text-[11px] rounded-lg bg-[#EFF6FF] text-[#1646A0] hover:bg-[#DBEAFE] font-medium border border-[#BFDBFE] transition-colors"
-              >
-                {demo.code} – {demo.name}
-              </button>
-            ))}
-          </div>
-        </div>
+
 
         <div className="flex justify-end gap-2 pt-4">
           <Button
