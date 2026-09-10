@@ -20,14 +20,14 @@ export function HeroBanner() {
 
         {/* Hero Title & Subtitle */}
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.15] text-white mb-4">
-          Minggu Aktiviti, <br className="hidden sm:inline" />
+          Portal Minggu Aktiviti <br className="hidden sm:inline" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#FDE68A]">
-            lebih meriah & tersusun.
+            Semester 2 Tahun 2026
           </span>
         </h1>
 
         <p className="text-base sm:text-lg text-blue-100/90 font-medium max-w-xl leading-relaxed mb-8">
-          Portal Minggu Aktiviti Semester 2 MRSM Tumpat 2026
+          MRSM Tumpat
         </p>
 
         {/* Quick event highlights pill bar */}
