@@ -402,7 +402,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Footer */}
       <footer className="mt-auto border-t border-[#E2E8F0] bg-white py-6 no-print text-center text-xs text-[#64748B]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>© 2026 Maktab Rendah Sains MARA Tumpat. Hak Cipta Terpelihara.</p>
+          <p>© 2026 Cikgu Biyamin - Maktab Rendah Sains MARA Tumpat. Hak Cipta Terpelihara.</p>
           <p className="flex items-center gap-1.5">
             <span>Pusat Kawalan Minggu Aktiviti Semester 2</span>
             <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A]" />
