@@ -11,7 +11,10 @@ import {
   Check,
   Trash2,
   RotateCcw,
-  AlertTriangle
+  AlertTriangle,
+  Lock,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -64,12 +67,18 @@ export default function KeputusanPage() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Delete & Reset Modals
+  // Delete & Reset Modals with mandatory admin password
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isResetAllModalOpen, setIsResetAllModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [showDeletePassword, setShowDeletePassword] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const [resetAdminPassword, setResetAdminPassword] = useState('');
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetError, setResetError] = useState('');
+
+  const MASTER_ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'super@MRSM2026';
 
   useEffect(() => {
     loadCompetitions();
@@ -212,28 +221,45 @@ export default function KeputusanPage() {
 
   const handleDeleteCompetitionResult = async () => {
     if (!selectedCompetition) return;
+
+    if (!deletePassword) {
+      setDeleteError('Sila masukkan kata laluan pentadbir.');
+      return;
+    }
+
+    if (deletePassword !== MASTER_ADMIN_PASSWORD) {
+      setDeleteError('Kata laluan pentadbir tidak tepat. Akses pemadaman ditolak.');
+      return;
+    }
+
     setDeleting(true);
     const res = await deleteCompetitionResult(selectedCompetition.id);
     setDeleting(false);
-    setIsDeleteModalOpen(false);
 
     if (res.success) {
       toast.success(`Keputusan bagi ${selectedCompetition.name} berjaya dipadam.`);
+      setIsDeleteModalOpen(false);
+      setDeletePassword('');
+      setShowDeletePassword(false);
+      setDeleteError('');
       setPlacements({ 1: '', 2: '', 3: '', 4: '', 5: '' });
       const results = await getResults();
       setExistingResults(results);
     } else {
+      setDeleteError(res.error || 'Gagal memadam keputusan.');
       toast.error(res.error || 'Gagal memadam keputusan.');
     }
   };
 
   const handleClearAllResults = async () => {
-    if (!isAdmin) {
-      const loginRes = loginAdmin(resetAdminPassword);
-      if (!loginRes.success) {
-        setResetError(loginRes.error || 'Kata laluan pentadbir tidak tepat.');
-        return;
-      }
+    if (!resetAdminPassword) {
+      setResetError('Sila masukkan kata laluan pentadbir.');
+      return;
+    }
+
+    if (resetAdminPassword !== MASTER_ADMIN_PASSWORD) {
+      setResetError('Kata laluan pentadbir tidak tepat. Akses pemadaman ditolak.');
+      return;
     }
 
     setDeleting(true);
@@ -244,6 +270,7 @@ export default function KeputusanPage() {
       toast.success('Semua data keputusan pemenang berjaya dikosongkan!');
       setIsResetAllModalOpen(false);
       setResetAdminPassword('');
+      setShowResetPassword(false);
       setResetError('');
       setPlacements({ 1: '', 2: '', 3: '', 4: '', 5: '' });
       setExistingResults([]);
@@ -286,6 +313,7 @@ export default function KeputusanPage() {
               size="sm"
               onClick={() => {
                 setResetAdminPassword('');
+                setShowResetPassword(false);
                 setResetError('');
                 setIsResetAllModalOpen(true);
               }}
@@ -367,7 +395,12 @@ export default function KeputusanPage() {
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => setIsDeleteModalOpen(true)}
+                        onClick={() => {
+                          setDeletePassword('');
+                          setShowDeletePassword(false);
+                          setDeleteError('');
+                          setIsDeleteModalOpen(true);
+                        }}
                         className="text-[#DC2626] border-[#FECACA] hover:bg-[#FEF2F2] text-xs h-8 w-full"
                       >
                         <Trash2 className="w-3.5 h-3.5 mr-1.5" />
@@ -626,9 +659,14 @@ export default function KeputusanPage() {
       {/* Delete Single Competition Result Modal */}
       <Modal
         isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        title="Padam Keputusan Pertandingan?"
-        description="Pengesahan untuk memadam keputusan bagi pertandingan yang dipilih."
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletePassword('');
+          setShowDeletePassword(false);
+          setDeleteError('');
+        }}
+        title="Padam Keputusan Pertandingan"
+        description="Akses keselamatan pentadbir diperlukan untuk memadam keputusan pertandingan ini."
         maxWidth="md"
       >
         <div className="space-y-4">
@@ -642,11 +680,55 @@ export default function KeputusanPage() {
             </div>
           </div>
 
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold text-[#172033]">
+              Pengesahan Kata Laluan Pentadbir (Admin) <span className="text-[#DC2626]">*</span>
+            </label>
+            <div className="relative">
+              <Lock className="w-4 h-4 text-[#94A3B8] absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type={showDeletePassword ? 'text' : 'password'}
+                autoFocus
+                value={deletePassword}
+                onChange={(e) => {
+                  setDeletePassword(e.target.value);
+                  if (deleteError) setDeleteError('');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleDeleteCompetitionResult();
+                  }
+                }}
+                placeholder="Masukkan kata laluan admin"
+                className="w-full pl-9 pr-10 py-2.5 text-xs bg-white border border-[#CBD5E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DC2626]"
+              />
+              <button
+                type="button"
+                onClick={() => setShowDeletePassword(!showDeletePassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#475569]"
+              >
+                {showDeletePassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            {deleteError && (
+              <p className="text-xs font-medium text-[#DC2626] flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{deleteError}</span>
+              </p>
+            )}
+          </div>
+
           <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#F1F5F9]">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsDeleteModalOpen(false)}
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setDeletePassword('');
+                setShowDeletePassword(false);
+                setDeleteError('');
+              }}
               disabled={deleting}
             >
               Batal
@@ -659,7 +741,7 @@ export default function KeputusanPage() {
               className="bg-[#DC2626] hover:bg-[#B91C1C] text-white border-none"
             >
               <Trash2 className="w-4 h-4 mr-1.5" />
-              Ya, Padam Keputusan
+              Sahkan Padam Keputusan
             </Button>
           </div>
         </div>
@@ -671,10 +753,11 @@ export default function KeputusanPage() {
         onClose={() => {
           setIsResetAllModalOpen(false);
           setResetAdminPassword('');
+          setShowResetPassword(false);
           setResetError('');
         }}
-        title="Kosongkan Semua Data Pemenang?"
-        description="Tindakan ini akan memadam kesemua rekod keputusan dan mengembalikan jadual ranking kepada kosong."
+        title="Kosongkan Semua Data Pemenang"
+        description="Akses keselamatan pentadbir diperlukan untuk memadam kesemua rekod keputusan."
         maxWidth="md"
       >
         <div className="space-y-4">
@@ -688,26 +771,44 @@ export default function KeputusanPage() {
             </div>
           </div>
 
-          {!isAdmin && (
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold text-[#172033]">
-                Kata Laluan Pentadbir (Admin)
-              </label>
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold text-[#172033]">
+              Pengesahan Kata Laluan Pentadbir (Admin) <span className="text-[#DC2626]">*</span>
+            </label>
+            <div className="relative">
+              <Lock className="w-4 h-4 text-[#94A3B8] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
-                type="password"
+                type={showResetPassword ? 'text' : 'password'}
+                autoFocus
                 value={resetAdminPassword}
                 onChange={(e) => {
                   setResetAdminPassword(e.target.value);
                   if (resetError) setResetError('');
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleClearAllResults();
+                  }
+                }}
                 placeholder="Masukkan kata laluan admin"
-                className="w-full px-3 py-2 text-xs bg-white border border-[#CBD5E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DC2626]"
+                className="w-full pl-9 pr-10 py-2.5 text-xs bg-white border border-[#CBD5E1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DC2626]"
               />
-              {resetError && (
-                <p className="text-xs text-[#DC2626]">{resetError}</p>
-              )}
+              <button
+                type="button"
+                onClick={() => setShowResetPassword(!showResetPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#475569]"
+              >
+                {showResetPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
-          )}
+            {resetError && (
+              <p className="text-xs font-medium text-[#DC2626] flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{resetError}</span>
+              </p>
+            )}
+          </div>
 
           <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#F1F5F9]">
             <Button
@@ -716,6 +817,7 @@ export default function KeputusanPage() {
               onClick={() => {
                 setIsResetAllModalOpen(false);
                 setResetAdminPassword('');
+                setShowResetPassword(false);
                 setResetError('');
               }}
               disabled={deleting}
