@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Trophy, 
+import {
+  Trophy,
   Printer
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -70,9 +70,8 @@ export default function DokumentasiPemenangPage() {
               <button
                 key={f}
                 onClick={() => setFilterForm(f)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  filterForm === f ? 'bg-white text-[#1646A0] shadow-xs' : 'text-[#64748B]'
-                }`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${filterForm === f ? 'bg-white text-[#1646A0] shadow-xs' : 'text-[#64748B]'
+                  }`}
               >
                 {f === 'all' ? 'Semua' : `T${f}`}
               </button>
@@ -93,10 +92,10 @@ export default function DokumentasiPemenangPage() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img 
-                src="/logo-mrsm.png" 
-                alt="Logo Maktab Rendah Sains MARA" 
-                className="w-16 h-16 object-contain shrink-0 filter drop-shadow-xs" 
+              <img
+                src="/logo-mrsm.png"
+                alt="Logo Maktab Rendah Sains MARA"
+                className="w-16 h-16 object-contain shrink-0 filter drop-shadow-xs"
               />
               <div>
                 <div className="text-xs font-bold tracking-wider text-[#1646A0] uppercase">
@@ -106,7 +105,7 @@ export default function DokumentasiPemenangPage() {
                   SENARAI PEMENANG MINGGU AKTIVITI SEMESTER 2
                 </h2>
                 <div className="text-xs text-[#64748B] mt-0.5">
-                  Tarikh Acara: 13–15 September 2026 • Dokumen Rasmi Pusat Kawalan
+                  Tarikh Acara: 13–15 September 2026 • Dokumen Rasmi
                 </div>
               </div>
             </div>

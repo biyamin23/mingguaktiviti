@@ -7,31 +7,31 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { 
-  Users, 
-  Home, 
-  CalendarDays, 
-  Trophy, 
-  FileCheck2, 
-  Camera, 
-  ArrowRight, 
-  Clock, 
+import {
+  Users,
+  Home,
+  CalendarDays,
+  Trophy,
+  FileCheck2,
+  Camera,
+  ArrowRight,
+  Clock,
   ChevronRight
 } from 'lucide-react';
-import { 
-  getTeachers, 
-  getHomerooms, 
-  getCompetitions, 
-  getScheduleSlots, 
-  getResults, 
-  getReports, 
-  getRankingByForm 
+import {
+  getTeachers,
+  getHomerooms,
+  getCompetitions,
+  getScheduleSlots,
+  getResults,
+  getReports,
+  getRankingByForm
 } from '@/lib/supabase/service';
-import { 
-  ScheduleSlot, 
-  Result, 
-  Report, 
-  HomeroomRanking 
+import {
+  ScheduleSlot,
+  Result,
+  Report,
+  HomeroomRanking
 } from '@/types/database';
 import { formatMalayDate, formatTimeRange } from '@/lib/utils';
 
@@ -134,7 +134,7 @@ export default function DashboardPage() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-bold text-[#172033] tracking-tight">
-            Ringkasan Statistik Pusat Kawalan
+            Ringkasan Statistik
           </h2>
           <span className="text-xs font-semibold text-[#64748B]">
             Semester 2 • 2026
@@ -233,28 +233,26 @@ export default function DashboardPage() {
                     return (
                       <div
                         key={item.homeroom_id}
-                        className={`p-2.5 rounded-xl border transition-all flex items-center justify-between ${
-                          isGold
+                        className={`p-2.5 rounded-xl border transition-all flex items-center justify-between ${isGold
                             ? 'bg-[#FEF9C3]/50 border-[#FDE047] shadow-xs'
                             : isSilver
-                            ? 'bg-[#F8FAFC] border-[#CBD5E1]'
-                            : isBronze
-                            ? 'bg-[#FFF7ED] border-[#FDBA74]'
-                            : 'bg-white border-[#E2E8F0]'
-                        }`}
+                              ? 'bg-[#F8FAFC] border-[#CBD5E1]'
+                              : isBronze
+                                ? 'bg-[#FFF7ED] border-[#FDBA74]'
+                                : 'bg-white border-[#E2E8F0]'
+                          }`}
                       >
                         <div className="flex items-center gap-2.5 truncate">
                           {/* Rank badge */}
                           <div
-                            className={`w-6 h-6 rounded-full flex items-center justify-center font-extrabold text-xs shrink-0 ${
-                              isGold
+                            className={`w-6 h-6 rounded-full flex items-center justify-center font-extrabold text-xs shrink-0 ${isGold
                                 ? 'bg-[#FBBF24] text-[#78350F]'
                                 : isSilver
-                                ? 'bg-[#E2E8F0] text-[#334155]'
-                                : isBronze
-                                ? 'bg-[#FDBA74] text-[#7C2D12]'
-                                : 'bg-[#F1F5F9] text-[#64748B]'
-                            }`}
+                                  ? 'bg-[#E2E8F0] text-[#334155]'
+                                  : isBronze
+                                    ? 'bg-[#FDBA74] text-[#7C2D12]'
+                                    : 'bg-[#F1F5F9] text-[#64748B]'
+                              }`}
                           >
                             {item.rank}
                           </div>
