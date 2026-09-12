@@ -2,7 +2,8 @@ import { supabase, isSupabaseConfigured } from './client';
 import { 
   Teacher, Homeroom, Competition, ScheduleSlot, 
   Result, ResultEntry, Report, ReportImage, 
-  MeritSetting, HomeroomRanking, FormLevel, CompetitionFormLevel 
+  MeritSetting, HomeroomRanking, FormLevel, CompetitionFormLevel,
+  CommunityPost, PostComment, CreatePostInput, CreateCommentInput
 } from '@/types/database';
 import { 
   INITIAL_TEACHERS, INITIAL_HOMEROOMS, INITIAL_COMPETITIONS, 
@@ -1045,3 +1046,338 @@ export async function uploadReportImage(
   const publicUrl = URL.createObjectURL(file);
   return { path: storagePath, publicUrl, error: null };
 }
+
+// -------------------------------------------------------------
+// 10. COMMUNITY SOCIAL MEDIA POSTS & COMMENTS (INSTAGRAM-STYLE)
+// -------------------------------------------------------------
+
+const INITIAL_COMMUNITY_POSTS: CommunityPost[] = [
+  {
+    id: 'post-1',
+    image_url: 'https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1200&q=80',
+    caption: 'Semangat membara perbarisan pembukaan Minggu Aktiviti Semester 2 MRSM Tumpat 2026! Tahniah kepada semua kontinjen homeroom yang tampil kemas dan berdisiplin. 🏆🔥 #MingguAktiviti2026 #MRSMTumpat #BerdisiplinBerilmuBeramal',
+    author_name: 'Cikgu Faris (Penyelaras)',
+    author_role: 'Guru',
+    likes_count: 38,
+    comments_count: 2,
+    created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(), // 45 mins ago
+    comments: [
+      {
+        id: 'comm-1',
+        post_id: 'post-1',
+        author_name: 'Muhammad Hakim (T3)',
+        author_role: 'Pelajar',
+        content: 'Terbaik cikgu! Kontinjen Homeroom kami bersedia untuk rebut merit Johan tahun ni! 💪',
+        created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+      },
+      {
+        id: 'comm-2',
+        post_id: 'post-1',
+        author_name: 'Ustaz Ubai',
+        author_role: 'Guru',
+        content: 'Meriah dan teratur sekali. Semoga semua murid bertanding dengan semangat kesukanan yang tinggi.',
+        created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+      }
+    ]
+  },
+  {
+    id: 'post-2',
+    image_url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=80',
+    caption: 'Pelancaran Eksperimen Roket Air & Pertandingan Inovasi Sains Tingkatan 2 petang tadi. Roket Homeroom Al-Biruni terbang paling jauh dan stabil! 🚀🧪✨ #SainsInovasi #Tingkatan2 #MRSMTumpat',
+    author_name: 'Ustazah Siti Aminah',
+    author_role: 'Guru',
+    likes_count: 27,
+    comments_count: 1,
+    created_at: new Date(Date.now() - 1000 * 60 * 180).toISOString(), // 3 hours ago
+    comments: [
+      {
+        id: 'comm-3',
+        post_id: 'post-2',
+        author_name: 'Nur Aina Sofea (T2)',
+        author_role: 'Pelajar',
+        content: 'Seronok sangat tadi ustazah, eksperimen menjadi dan dapat banyak ilmu baru!',
+        created_at: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
+      }
+    ]
+  },
+  {
+    id: 'post-3',
+    image_url: 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80',
+    caption: 'Kenangan manis bersama kawan-kawan Homeroom Cikgu Aisyah selepas berjaya raih Johan Newspaper Scavenger Hunt! Terima kasih atas sokongan padu semua penasihat. 🥇🎉 #HomeroomCikguAisyah #Tingkatan1 #MeritJuara',
+    author_name: 'Danish Haikal (T1)',
+    author_role: 'Pelajar',
+    likes_count: 45,
+    comments_count: 2,
+    created_at: new Date(Date.now() - 1000 * 60 * 360).toISOString(), // 6 hours ago
+    comments: [
+      {
+        id: 'comm-4',
+        post_id: 'post-3',
+        author_name: 'Cikgu Aisyah',
+        author_role: 'Guru',
+        content: 'Tahniah anak-anak homeroom! Kerjasama dan komitmen anda semua sangat membanggakan!',
+        created_at: new Date(Date.now() - 1000 * 60 * 300).toISOString(),
+      },
+      {
+        id: 'comm-5',
+        post_id: 'post-3',
+        author_name: 'Amirul Syafiq',
+        author_role: 'Pelajar',
+        content: 'Padu Danish! Jumpa di acara sukan esok pula! 🏃‍♂️',
+        created_at: new Date(Date.now() - 1000 * 60 * 240).toISOString(),
+      }
+    ]
+  }
+];
+
+export async function uploadCommunityPostImage(
+  file: Blob
+): Promise<{ path: string; publicUrl: string; error: string | null }> {
+  const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.webp`;
+  const storagePath = `community/${fileName}`;
+
+  if (isSupabaseConfigured) {
+    try {
+      const { error } = await supabase.storage
+        .from('report-images')
+        .upload(storagePath, file, {
+          contentType: 'image/webp',
+          upsert: true
+        });
+
+      if (!error) {
+        const { data: publicUrlData } = supabase.storage
+          .from('report-images')
+          .getPublicUrl(storagePath);
+
+        return { path: storagePath, publicUrl: publicUrlData.publicUrl, error: null };
+      }
+    } catch (e: any) {
+      console.warn('Supabase uploadCommunityPostImage error, using ObjectURL fallback:', e);
+    }
+  }
+
+  // Fallback in browser: Object URL or base64 data URL
+  const publicUrl = URL.createObjectURL(file);
+  return { path: storagePath, publicUrl, error: null };
+}
+
+export async function getCommunityPosts(clientId?: string): Promise<CommunityPost[]> {
+  if (isSupabaseConfigured) {
+    try {
+      const { data: postsData, error: postsError } = await supabase
+        .from('community_posts')
+        .select(`
+          *,
+          teacher:teachers(id, name, salary_no, role),
+          comments:post_comments(*),
+          likes:post_likes(*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (!postsError && postsData) {
+        return postsData.map((p: any) => ({
+          id: p.id,
+          image_url: p.image_url,
+          storage_path: p.storage_path,
+          caption: p.caption,
+          author_name: p.author_name,
+          author_role: p.author_role || (p.teacher ? 'Guru' : 'Warga MRSM'),
+          teacher_id: p.teacher_id,
+          teacher: p.teacher,
+          likes_count: p.likes_count || (p.likes ? p.likes.length : 0),
+          has_liked: clientId && p.likes ? p.likes.some((l: any) => l.client_id === clientId) : false,
+          comments_count: p.comments ? p.comments.length : 0,
+          comments: (p.comments || []).sort((a: any, b: any) => 
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+          ),
+          created_at: p.created_at,
+          updated_at: p.updated_at
+        }));
+      }
+    } catch (e) {
+      console.warn('Supabase getCommunityPosts failed, using local store:', e);
+    }
+  }
+
+  // Local storage fallback
+  const localPosts = getLocalStore<CommunityPost[]>('community_posts', INITIAL_COMMUNITY_POSTS);
+  const userLikes = getLocalStore<Record<string, boolean>>('community_user_likes_' + (clientId || 'guest'), {});
+
+  return localPosts.map(p => ({
+    ...p,
+    has_liked: !!userLikes[p.id],
+    comments_count: p.comments ? p.comments.length : 0,
+    comments: p.comments || []
+  }));
+}
+
+export async function createCommunityPost(
+  input: CreatePostInput
+): Promise<{ data: CommunityPost | null; error: string | null }> {
+  const newPostId = 'post-' + Date.now();
+  const newPost: CommunityPost = {
+    id: newPostId,
+    image_url: input.image_url,
+    storage_path: input.storage_path,
+    caption: input.caption,
+    author_name: input.author_name,
+    author_role: input.author_role,
+    teacher_id: input.teacher_id || null,
+    likes_count: 0,
+    has_liked: false,
+    comments_count: 0,
+    comments: [],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  if (isSupabaseConfigured) {
+    try {
+      const { data, error } = await supabase
+        .from('community_posts')
+        .insert([{
+          image_url: input.image_url,
+          storage_path: input.storage_path,
+          caption: input.caption,
+          author_name: input.author_name,
+          author_role: input.author_role,
+          teacher_id: input.teacher_id || null
+        }])
+        .select()
+        .single();
+
+      if (!error && data) {
+        newPost.id = data.id;
+        newPost.created_at = data.created_at;
+      }
+    } catch (e: any) {
+      console.warn('Supabase createCommunityPost error, saving to local store:', e);
+    }
+  }
+
+  // Always update local store
+  const existing = getLocalStore<CommunityPost[]>('community_posts', INITIAL_COMMUNITY_POSTS);
+  setLocalStore('community_posts', [newPost, ...existing]);
+
+  return { data: newPost, error: null };
+}
+
+export async function addPostComment(
+  input: CreateCommentInput
+): Promise<{ data: PostComment | null; error: string | null }> {
+  const newCommentId = 'comm-' + Date.now();
+  const newComment: PostComment = {
+    id: newCommentId,
+    post_id: input.post_id,
+    author_name: input.author_name,
+    author_role: input.author_role,
+    teacher_id: input.teacher_id || null,
+    content: input.content,
+    created_at: new Date().toISOString()
+  };
+
+  if (isSupabaseConfigured) {
+    try {
+      const { data, error } = await supabase
+        .from('post_comments')
+        .insert([{
+          post_id: input.post_id,
+          author_name: input.author_name,
+          author_role: input.author_role,
+          teacher_id: input.teacher_id || null,
+          content: input.content
+        }])
+        .select()
+        .single();
+
+      if (!error && data) {
+        newComment.id = data.id;
+        newComment.created_at = data.created_at;
+      }
+    } catch (e: any) {
+      console.warn('Supabase addPostComment error, using local:', e);
+    }
+  }
+
+  // Update local store
+  const existing = getLocalStore<CommunityPost[]>('community_posts', INITIAL_COMMUNITY_POSTS);
+  const updated = existing.map(p => {
+    if (p.id === input.post_id) {
+      const currentComments = p.comments || [];
+      return {
+        ...p,
+        comments: [...currentComments, newComment],
+        comments_count: currentComments.length + 1
+      };
+    }
+    return p;
+  });
+  setLocalStore('community_posts', updated);
+
+  return { data: newComment, error: null };
+}
+
+export async function togglePostLike(
+  postId: string,
+  clientId: string
+): Promise<{ liked: boolean; likesCount: number; error: string | null }> {
+  const existing = getLocalStore<CommunityPost[]>('community_posts', INITIAL_COMMUNITY_POSTS);
+  const userLikesKey = 'community_user_likes_' + clientId;
+  const userLikes = getLocalStore<Record<string, boolean>>(userLikesKey, {});
+  
+  const currentlyLiked = !!userLikes[postId];
+  const newLikedState = !currentlyLiked;
+
+  let newLikesCount = 0;
+  const updated = existing.map(p => {
+    if (p.id === postId) {
+      newLikesCount = Math.max(0, (p.likes_count || 0) + (newLikedState ? 1 : -1));
+      return {
+        ...p,
+        likes_count: newLikesCount,
+        has_liked: newLikedState
+      };
+    }
+    return p;
+  });
+
+  userLikes[postId] = newLikedState;
+  setLocalStore(userLikesKey, userLikes);
+  setLocalStore('community_posts', updated);
+
+  if (isSupabaseConfigured) {
+    try {
+      if (newLikedState) {
+        await supabase.from('post_likes').insert([{ post_id: postId, client_id: clientId }]);
+        await supabase.from('community_posts').update({ likes_count: newLikesCount }).eq('id', postId);
+      } else {
+        await supabase.from('post_likes').delete().match({ post_id: postId, client_id: clientId });
+        await supabase.from('community_posts').update({ likes_count: newLikesCount }).eq('id', postId);
+      }
+    } catch (e: any) {
+      console.warn('Supabase togglePostLike error:', e);
+    }
+  }
+
+  return { liked: newLikedState, likesCount: newLikesCount, error: null };
+}
+
+export async function deleteCommunityPost(
+  postId: string
+): Promise<{ success: boolean; error: string | null }> {
+  if (isSupabaseConfigured) {
+    try {
+      await supabase.from('community_posts').delete().eq('id', postId);
+    } catch (e: any) {
+      console.warn('Supabase deleteCommunityPost error:', e);
+    }
+  }
+
+  const existing = getLocalStore<CommunityPost[]>('community_posts', INITIAL_COMMUNITY_POSTS);
+  const filtered = existing.filter(p => p.id !== postId);
+  setLocalStore('community_posts', filtered);
+
+  return { success: true, error: null };
+}
+

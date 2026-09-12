@@ -57,6 +57,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       ]
     },
     { label: 'Laporan Bergambar', href: '/laporan-bergambar', icon: Camera, requiresAuth: true },
+    { label: 'Momen Komuniti', href: '/momen', icon: Sparkles },
     { label: 'Galeri Foto', href: '/galeri', icon: Images },
     { 
       label: 'Data Master', 

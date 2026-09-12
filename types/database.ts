@@ -143,3 +143,54 @@ export interface MasterDataImportSummary {
     notes?: string;
   }[];
 }
+
+export interface PostComment {
+  id: string;
+  post_id: string;
+  author_name: string;
+  author_role: string; // 'Guru' | 'Pelajar' | 'Warga MRSM' | etc.
+  teacher_id?: string | null;
+  content: string;
+  created_at: string;
+}
+
+export interface PostLike {
+  id: string;
+  post_id: string;
+  client_id: string;
+  created_at?: string;
+}
+
+export interface CommunityPost {
+  id: string;
+  image_url: string;
+  storage_path?: string;
+  caption?: string | null;
+  author_name: string;
+  author_role: string; // 'Guru' | 'Pelajar' | 'Warga MRSM'
+  teacher_id?: string | null;
+  teacher?: Teacher | null;
+  likes_count: number;
+  has_liked?: boolean;
+  comments_count: number;
+  comments?: PostComment[];
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface CreatePostInput {
+  image_url: string;
+  storage_path?: string;
+  caption: string;
+  author_name: string;
+  author_role: string;
+  teacher_id?: string | null;
+}
+
+export interface CreateCommentInput {
+  post_id: string;
+  author_name: string;
+  author_role: string;
+  teacher_id?: string | null;
+  content: string;
+}
