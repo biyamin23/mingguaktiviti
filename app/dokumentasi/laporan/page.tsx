@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
-import { getReports } from '@/lib/supabase/service';
+import { getReports, getReportImageUrl } from '@/lib/supabase/service';
 import { Report } from '@/types/database';
 import { formatMalayDate, formatTimeRange } from '@/lib/utils';
 
@@ -176,9 +176,10 @@ export default function DokumentasiLaporanPage() {
                       <div key={i} className="w-16 h-12 rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E2E8F0]">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={img.public_url || img.storage_path}
+                          src={getReportImageUrl(img)}
                           alt="Thumbnail"
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                       </div>
                     ))}
@@ -311,12 +312,13 @@ export default function DokumentasiLaporanPage() {
               <div className="grid grid-cols-2 gap-4">
                 {selectedReport.images?.map((img, i) => (
                   <div key={i} className="border border-[#E2E8F0] rounded-xl p-2 bg-white space-y-1.5">
-                    <div className="aspect-4/3 w-full rounded-lg overflow-hidden bg-[#F1F5F9]">
+                    <div className="aspect-4/3 w-full rounded-lg overflow-hidden bg-[#F1F5F9] relative flex items-center justify-center">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={img.public_url || img.storage_path}
+                        src={getReportImageUrl(img)}
                         alt={img.caption || `Foto ${i + 1}`}
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     </div>
                     {img.caption && (

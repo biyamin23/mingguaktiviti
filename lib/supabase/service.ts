@@ -880,6 +880,27 @@ export async function getRankingByForm(form: FormLevel): Promise<HomeroomRanking
 // -------------------------------------------------------------
 // 8. REPORTS & IMAGES (LAPORAN BERGAMBAR & GALERI)
 // -------------------------------------------------------------
+
+export function getReportImageUrl(img?: { public_url?: string; storage_path?: string } | null): string {
+  if (!img) return '';
+  if (img.public_url && (img.public_url.startsWith('http://') || img.public_url.startsWith('https://') || img.public_url.startsWith('data:'))) {
+    return img.public_url;
+  }
+  if (img.storage_path) {
+    if (img.storage_path.startsWith('http://') || img.storage_path.startsWith('https://') || img.storage_path.startsWith('data:')) {
+      return img.storage_path;
+    }
+    const cleanPath = img.storage_path.replace(/^\/+/, '');
+    const { data } = supabase.storage
+      .from('report-images')
+      .getPublicUrl(cleanPath);
+    if (data?.publicUrl) {
+      return data.publicUrl;
+    }
+  }
+  return img.public_url || '';
+}
+
 export async function getReports(): Promise<Report[]> {
   const slots = await getScheduleSlots();
   const teachers = await getTeachers();
@@ -897,7 +918,15 @@ export async function getReports(): Promise<Report[]> {
           images:report_images(*)
         `)
         .order('created_at', { ascending: false });
-      if (!error && data && data.length > 0) return data as Report[];
+      if (!error && data && data.length > 0) {
+        return data.map((rep: any) => ({
+          ...rep,
+          images: (rep.images || []).map((img: any) => ({
+            ...img,
+            public_url: getReportImageUrl(img)
+          }))
+        })) as Report[];
+      }
     } catch (e) {
       console.warn('Falling back to local reports:', e);
     }
@@ -907,7 +936,11 @@ export async function getReports(): Promise<Report[]> {
   return local.map(r => ({
     ...r,
     schedule_slot: slotMap.get(r.schedule_slot_id) || r.schedule_slot,
-    uploaded_by: r.uploaded_by_teacher_id ? teacherMap.get(r.uploaded_by_teacher_id) || null : null
+    uploaded_by: r.uploaded_by_teacher_id ? teacherMap.get(r.uploaded_by_teacher_id) || null : null,
+    images: (r.images || []).map(img => ({
+      ...img,
+      public_url: getReportImageUrl(img)
+    }))
   }));
 }
 

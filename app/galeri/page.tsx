@@ -11,7 +11,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
-import { getReports } from '@/lib/supabase/service';
+import { getReports, getReportImageUrl } from '@/lib/supabase/service';
 import { formatMalayDate } from '@/lib/utils';
 
 interface GalleryItem {
@@ -42,7 +42,7 @@ export default function GaleriPage() {
             report.images.forEach(img => {
               galleryList.push({
                 id: img.id,
-                url: img.public_url || img.storage_path,
+                url: getReportImageUrl(img),
                 caption: img.caption,
                 slotTitle: report.schedule_slot?.title || 'Aktiviti Minggu Ini',
                 date: report.schedule_slot?.date || report.created_at || '2026-09-13',
