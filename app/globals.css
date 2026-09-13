@@ -83,13 +83,39 @@ body {
 
 /* Print Rules for A4 Documentation */
 @media print {
-  body {
+  html, body {
     background: #FFFFFF !important;
     color: #000000 !important;
-    font-size: 12pt;
+    font-size: 11pt !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  .no-print, nav, header, aside, .sidebar-container, button, .print-hide {
+  /* Reset all layout containers so print engine paginates freely */
+  body > div,
+  main,
+  .min-h-screen {
+    display: block !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .no-print, 
+  nav, 
+  header, 
+  aside, 
+  footer, 
+  .sidebar-container, 
+  button, 
+  .print-hide {
     display: none !important;
   }
 
@@ -97,18 +123,60 @@ body {
     display: block !important;
   }
 
+  /* Modal Overlay Reset: Turn off fixed positioning, backdrop, clipping and flex centering */
+  .report-modal-overlay {
+    position: static !important;
+    display: block !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: auto !important;
+  }
+
   .a4-print-page {
+    position: static !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
-    padding: 10mm !important;
+    padding: 0 !important;
     box-shadow: none !important;
     border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  /* Avoid cutting photos, header, or signatures in half across page breaks */
+  .print-avoid-break,
+  .print-header,
+  .print-metadata,
+  .print-photo-card,
+  .print-signatures {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Ensure photos in print maintain good proportions and fit neatly across pages */
+  .print-photo-card {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .print-photo-img {
+    max-height: 240px !important;
+    object-fit: cover !important;
   }
 
   @page {
     size: A4 portrait;
-    margin: 12mm;
+    margin: 12mm 12mm 15mm 12mm;
   }
 
   @page landscape-page {

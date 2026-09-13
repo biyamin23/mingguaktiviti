@@ -215,8 +215,8 @@ export default function DokumentasiLaporanPage() {
 
       {/* A4 Report Modal & Print View */}
       {selectedReport && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs overflow-y-auto">
-          <div className="relative max-w-4xl w-full bg-white rounded-2xl shadow-2xl p-6 sm:p-10 my-8 a4-print-page">
+        <div className="report-modal-overlay fixed inset-0 z-50 overflow-y-auto p-4 sm:p-8 bg-black/70 backdrop-blur-xs">
+          <div className="relative max-w-4xl w-full mx-auto bg-white rounded-2xl shadow-2xl p-6 sm:p-10 my-4 sm:my-8 a4-print-page">
             {/* Top Toolbar (Hidden on print) */}
             <div className="flex items-center justify-between pb-4 mb-6 border-b border-[#E2E8F0] no-print">
               <div className="text-xs font-bold text-[#1646A0]">
@@ -237,7 +237,7 @@ export default function DokumentasiLaporanPage() {
             </div>
 
             {/* Official MRSM Header */}
-            <div className="border-b-2 border-[#1646A0] pb-6 mb-6">
+            <div className="border-b-2 border-[#1646A0] pb-6 mb-6 print-header print-avoid-break">
               <div className="flex items-center gap-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img 
@@ -260,7 +260,7 @@ export default function DokumentasiLaporanPage() {
             </div>
 
             {/* Metadata Table */}
-            <div className="bg-[#F8FAFC] rounded-xl border border-[#CBD5E1] p-4 mb-6 text-xs grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="bg-[#F8FAFC] rounded-xl border border-[#CBD5E1] p-4 mb-6 text-xs grid grid-cols-2 sm:grid-cols-4 gap-4 print-metadata print-avoid-break">
               <div>
                 <span className="text-[#64748B] block">Slot / Aktiviti:</span>
                 <strong className="text-[#172033] text-sm">{selectedReport.schedule_slot?.title}</strong>
@@ -294,7 +294,7 @@ export default function DokumentasiLaporanPage() {
             </div>
 
             {/* Ringkasan Aktiviti */}
-            <div className="mb-6 space-y-2">
+            <div className="mb-6 space-y-2 print-avoid-break">
               <h3 className="text-sm font-bold text-[#172033] border-b pb-1">
                 Ringkasan Aktiviti
               </h3>
@@ -311,13 +311,13 @@ export default function DokumentasiLaporanPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 {selectedReport.images?.map((img, i) => (
-                  <div key={i} className="border border-[#E2E8F0] rounded-xl p-2 bg-white space-y-1.5">
+                  <div key={i} className="border border-[#E2E8F0] rounded-xl p-2 bg-white space-y-1.5 print-photo-card print-avoid-break">
                     <div className="aspect-4/3 w-full rounded-lg overflow-hidden bg-[#F1F5F9] relative flex items-center justify-center">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={getReportImageUrl(img)}
                         alt={img.caption || `Foto ${i + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover print-photo-img"
                         loading="lazy"
                       />
                     </div>
@@ -332,7 +332,7 @@ export default function DokumentasiLaporanPage() {
             </div>
 
             {/* Signatures */}
-            <div className="pt-8 border-t border-[#CBD5E1] grid grid-cols-2 gap-8 text-center text-xs">
+            <div className="pt-8 border-t border-[#CBD5E1] grid grid-cols-2 gap-8 text-center text-xs print-signatures print-avoid-break">
               <div>
                 <p className="text-[#64748B]">Disediakan Oleh:</p>
                 <div className="h-16" />
